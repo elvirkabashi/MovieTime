@@ -1,4 +1,4 @@
-# Movie Viewing Management System
+# MovieTime
 
 ## Overview
 
@@ -32,3 +32,8 @@ To utilize the system, users can sign up for an account, log in, and start addin
   - ASP .NET MVC for admin functionality
   - ASP .NET Web API for user functionality
 - **Database**: MSSQL
+
+## Related Repositories
+
+- [Backend Repository](https://github.com/elvirkabashi/MovieTime)
+- [Frontend Repository](https://github.com/elvirkabashi/MovieTimeUI)
