@@ -1,0 +1,119 @@
+﻿@model IEnumerable<MovieTime.Models.Movie>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h1 class="text-white">Movies</h1>
+
+<form asp-action="Index" method="get" class="mb-4">
+    <div class="d-flex float-end">
+        <div class="mb-4 d-flex flex-column ">
+            <label for="genreFilter" class="form-label text-white">Filter By Genre:</label>
+            <select id="genreFilter" name="genre" class="form-select" style="width: 100%;">
+                <option value="">All Genres</option>
+    
+                <option value="Action">Action</option>
+                <option value="Comedy">Comedy</option>
+                <option value="Romance">Romance</option>
+                <option value="Thriller">Thriller</option>
+                <option value="Drama">Drama</option>
+ 
+            </select>
+        </div>
+
+        <div class="d-flex align-items-center ms-2">
+            <div class="">
+                <input type="text" id="searchKeyword" name="searchKeyword" placeholder="Search movies.." value="@ViewBag.SearchKeyword" class="form-control" style="width: 100%;">
+            </div>
+
+            <div class="ms-2">
+                <button type="submit" class="btn btn-outline-warning text-white " style="width: 100%;font-size:14px">Search</button>
+                @if (!string.IsNullOrEmpty(ViewBag.SearchKeyword))
+                {
+                    <a class="btn btn-secondary mt-2" href="@Url.Action("Index", new { page = 1, genre = ViewBag.GenreFilter })">Clear Search</a>
+                }
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+
+
+<p class="mt-3">
+    <a class="  text-white font-weight-bold border-bottom light-gold " asp-action="Create">Create Movie</a>
+    <a class="  text-white font-weight-bold border-bottom border-light " asp-action="Create" asp-controller="Actors">Create Actor</a>
+</p>
+
+<table class="table text-white">
+    <thead>
+        <tr>
+            <th>
+                <a class="text-decoration-none text-white" asp-action="Index" asp-route-sortOrder="@ViewData["TitleSortParm"]">Title<i class="bi bi-arrow-down-up text-white ms-1"></i></a>
+            </th>
+            <th>
+                <a class="text-decoration-none text-white" asp-action="Index" asp-route-sortOrder="@ViewData["YearSortParm"]">Year<i class="bi bi-arrow-down-up text-white ms-1"></i></a>
+            </th>
+            <th>
+                Actors
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Genre)
+            </th>
+            <th>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Year)
+                </td>
+                <td>
+                    @if (item.MovieActor != null)
+                    {
+                        @if (@item.MovieActor.Count > 1)
+                        {
+                            <span>@item.MovieActor.Count actors</span>
+                        }
+                        else
+                        {
+                            <span>@item.MovieActor.Count actor</span>
+                        }
+
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Genre.GenreName)
+                </td>
+                <td>
+                    <a class="btn btn-outline-warning text-white" asp-action="Edit" asp-route-id="@item.MovieId">Edit</a>
+                    <a class="btn btn-outline-warning text-white" asp-action="Details" asp-route-id="@item.MovieId">Details</a>
+                    <a class="btn btn-outline-warning text-white" asp-action="Delete" asp-route-id="@item.MovieId">Delete</a>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="pagination d-flex justify-content-end">
+    <div aria-label="Page navigation">
+        <ul class="pagination">
+            @for (int i = ViewBag.Pagination.StartPage; i <= ViewBag.Pagination.EndPage; i++)
+            {
+                <li class="page-item @(i == ViewBag.Pagination.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { page = i, genre = ViewBag.GenreFilter ,searchKeyword=ViewBag.SearchKeyword})">@i</a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+

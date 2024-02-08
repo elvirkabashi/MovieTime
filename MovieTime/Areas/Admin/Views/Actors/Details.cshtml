@@ -1,0 +1,42 @@
+﻿@model MovieTime.Models.Actor
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4 class="text-white">Actor Details</h4>
+    <hr />
+    <dl class="row text-white">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Birthdate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Birthdate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Img)
+        </dt>
+        <dd class = "col-sm-10">
+            <img src="@Url.Content($"~/actors/{Model.Img}")" alt="Actor Image" width="300" height="500" />
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.ActorId" class="text-warning">Edit</a> |
+    <a asp-action="Index" class="text-warning">Back to List</a>
+</div>

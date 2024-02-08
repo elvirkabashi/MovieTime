@@ -1,0 +1,46 @@
+﻿@model MovieTime.Models.Actor
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h4 class="text-white">Create Actor</h4>
+<hr />
+<div class="row text-white">
+    <div class="col-md-4">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" placeholder="Actor Name"/>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Birthdate" class="control-label"></label>
+                <input asp-for="Birthdate" class="form-control" />
+                <span asp-validation-for="Birthdate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Img" class="control-label"></label>
+                <input asp-for="ImageFile" type="file" class="form-control"     />
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" placeholder="Actor Bio" />
+                <span asp-validation-for="Description" class="text-danger" ></span>
+            </div>
+            <div class="form-group float-end mt-3">
+                <input type="submit" value="Create" class="btn btn-outline-warning" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a class="text-warning" asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

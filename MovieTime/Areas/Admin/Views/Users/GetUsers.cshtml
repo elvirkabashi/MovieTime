@@ -1,0 +1,165 @@
+﻿@model List<MovieTime.Models.ApplicationUser>
+@inject Microsoft.AspNetCore.Identity.UserManager<MovieTime.Models.ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "GetUsers";
+}
+
+<h1 class="text-white">Users</h1>
+<form asp-controller="Users" asp-action="GetUsers" method="get" class="mb-4">
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="role_Admin" name="roles" value="Admin" @(ViewBag.SelectedRoles != null && (ViewBag.SelectedRoles as string[])?.Contains("Admin") == true ? "checked" : "")>
+        <label class="form-check-label text-white font-weight-bold" for="role_Admin">Admin</label>
+    </div>
+    <button type="submit" class="btn btn-outline-warning text-white" >Filter Admins</button>
+</form>
+<table class="table us text-white">
+    <thead>
+        <tr>
+            <th>NO.</th>
+            <th>BASIC INFO</th>
+            <th><a class="text-decoration-none text-white" asp-action="GetUsers" asp-route-sortOrder="@((ViewData["UserNameSortParm"] == "username_desc") ? "" : "username_desc")">USERNAME<i class="bi bi-arrow-down-up text-white ms-1"></i></a></th>
+            <th><a class="text-decoration-none text-white" asp-action="GetUsers" asp-route-sortOrder="@ViewData["StatusSortParm"]">STATUS<i class="bi bi-arrow-down-up text-white ms-1"></i></a></th>
+            <th>ROLE</th>
+            <th>DATE</th>
+            <th>ACTIONS</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            var index = 1;
+        }
+        @foreach (var user in Model)
+        {
+        <tr>
+            <td class="text-center" style="border-bottom-left-radius:10px;border-top-left-radius:10px;">
+                <div>
+                @((index))
+                </div>
+            </td>
+            <td>
+                <div class="d-flex align-itmens-center" style="width:150px">
+                    <div class="rounded-3" style="background-color:#1a191f">
+                        <i class="bi bi-person fs-4 px-2 "></i>
+                    </div>
+                    <div class="d-flex flex-column ms-2">
+                        <span style="font-size:13px;font-weight:500;">@user.FullName</span>
+                        <span style="font-size:11px;font-weight:400;opacity:70%">@user.Email</span>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="d-flex align-items-center">
+                    <span>@user.UserName</span>
+                </div>
+            </td>
+            <td>
+                <div>
+                     @if (user.IsActivated)
+                     {
+                         <span class="text-success">Activated</span>
+                     }
+                     else
+                     {
+                         <span class="text-danger">Deactivated</span>
+                     }
+                </div>
+            </td>
+            <td>
+                <div>
+                        @{
+                            var roles = await UserManager.GetRolesAsync(user);
+                            var rolesString = string.Join(", ", roles);
+                        }
+                        @rolesString
+                </div>
+            </td>
+            <td>
+                <div>
+                        <span>@user.CreatedAt.ToString("dd/MM/yy")</span>
+                </div>
+            </td>
+            <td style="border-bottom-right-radius:10px;border-top-right-radius:10px;">
+                <div class="d-flex justify-content-center align-items-center h-auto">
+                    @if (!user.IsActivated)
+                    {
+                        <form asp-controller="Users" asp-action="ActivateUser" method="post">
+                            <input type="hidden" name="userId" value="@user.Id" />
+                            <button type="submit" class="btn bi bi-unlock fs-5 text-success me-1"></button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-controller="Users" asp-action="DeactivateUser" method="post">
+                            <input type="hidden" name="userId" value="@user.Id" />
+                            <button type="submit" class="btn bi bi-lock-fill fs-5 text-danger me-1"></button>
+                        </form>
+                    }
+                    <i class="bi bi-pencil-square text-secondary" style="font-size:25px" onclick="showUserActionsModal('@user.Id')"></i>
+
+                    <form id="deleteForm_@user.Id" asp-controller="Users" asp-action="DeleteUser" method="post">
+                        <input type="hidden" name="userId" value="@user.Id" />
+                        <a type="button" class="ms-2" onclick="confirmDelete('@user.Id', '@user.UserName')"><i style="font-size:20px" class="bi bi-trash3 text-danger"></i></a>
+                    </form>
+                </div>
+            </td>
+            </tr>
+            index++;
+         }
+    </tbody>
+</table>
+
+
+
+<div class="modal" tabindex="-1" role="dialog" id="userActionsModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Actions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="Users" asp-action="ChangeUserRolePost" method="post">
+                    <input type="hidden" id="modalUserId" name="userId" />
+                    <select name="newRole" class="form-select form-select-sm">
+                        <option selected>Change Role</option>
+                        <option value="User">User</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                    <button type="submit" class="btn btn-outline-dark mt-2" style="float:right">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showUserActionsModal(userId) {
+        document.getElementById('modalUserId').value = userId;
+        var userActionsModal = new bootstrap.Modal(document.getElementById('userActionsModal'));
+        userActionsModal.show();
+    }
+</script>
+<script>
+    function confirmDelete(userId, username) {
+        var confirmation = confirm(`Are you sure you want to delete user '${username}'?`);
+
+        if (confirmation) {
+            document.getElementById('deleteForm_' + userId).submit();
+        }
+    }
+</script>
+<div class="pagination d-flex justify-content-end">
+    <ul class="pagination">
+        @for (int i = 1; i <= ViewBag.Pagination.TotalPages; i++)
+        {
+            <li class="page-item @(i == ViewBag.Pagination.CurrentPage ? "active" : "")">
+                <a class="page-link" href="@Url.Action("GetUsers", new { page = i, sortOrder = ViewBag.Pagination.SortOrder })">@i</a>
+            </li>
+        }
+    </ul>
+</div>
+
+
+
+

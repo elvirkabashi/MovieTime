@@ -1,0 +1,27 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using MovieTime.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        var user = await UserManager.GetUserAsync(User);
+        var roles = await UserManager.GetRolesAsync(user);
+
+        <div class="d-flex justify-content-center align-items-center gap-3">
+            <div class="rounded-3" style="background-color:#212529; height:40px">
+                <i class="bi bi-person fs-3 px-2 "></i>
+            </div>
+            <div class="mt-2">
+                <small style="font-size:9px;">@string.Join(", ", roles)</small>
+                <p style="font-size:14px">@user.FullName</p>
+            </div>
+            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Movies", new { area = "Admin" })">
+                <div class="rounded-3" style="border:2px solid #f9ab00; height:40px">
+                    <button type="submit" class="nav-link btn btn-link text-white" style="width:40px;height:40px"><i class="bi bi-box-arrow-right"></i></button>
+                </div>
+            </form>
+        </div>
+    }
+</ul>

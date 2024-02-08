@@ -1,0 +1,264 @@
+﻿@model MovieTime.dto.DashboardData
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="d-flex justify-content-between text-white">
+    <h2>Dashboard</h2>
+    <a class="btn btn-outline-warning text-white" style="height:34px; font-size:13px" asp-area="Admin" asp-controller="Movies" asp-action="Create">Add item</a>
+</div>
+<hr style="background-color:white" />
+
+<div class="container-fluid">
+    <div class="d-flex gap-4">
+        <div class="w-25 bg-card p-3 rounded-3">
+            <p class="d-inline text-white">All users active</p>
+            <div class="d-flex justify-content-between">
+                <h2 class="py-1">@Model.UsersCount</h2> 
+                <h2 class="bi bi-people"></h2>
+            </div>
+        </div>        
+        <div class="w-25 bg-card p-3 rounded-3">
+            <p class="d-inline">Items added this month</p>
+            <div class="d-flex justify-content-between">
+                <h2 class="py-1">@Model.MoviesCount</h2>
+                <h2 class="bi bi-film"></h2>
+            </div>
+        </div>
+        <div class="w-25 bg-card p-3 rounded-3">
+            <p class="d-inline">New comments</p>
+            <div class="d-flex justify-content-between">
+                <h2 class="py-1">@Model.CountComents</h2>
+                <h2 class="bi bi-chat"></h2>
+            </div>
+        </div>        
+        <div class="w-25 bg-card p-3 rounded-3">
+            <p class="d-inline">New reviews</p>
+            <div class="d-flex justify-content-between">
+                <h2 class="py-1">@Model.TotalRatingsSum</h2>
+                <h2 class="bi bi-star-half"></h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="my-5">
+
+        <div class ="d-flex">
+            <div class="w-50 bg-card rounded-3">
+                <div class="d-flex justify-content-between border-bottom px-2 pt-3 pb-2">
+                    <h6 class="bi bi-trophy"><span class="ms-2">Top Movies</span></h6>
+                    <div>
+                        <i class="bi bi-arrow-clockwise text-white me-3"></i>
+                        <a asp-area="Admin" asp-controller="Movies" asp-action="Index" class="btn btn-sm text-white">View All</a>
+                    </div>
+                </div>
+                <div class="p-3">
+                    <table class="table dt text-white">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>TITLE</th>
+                                <th>GENRE</th>
+                                <th>RATING</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var movie in Model.TopMovies)
+                            {
+                                <tr>
+                                    <td>@movie.MovieId</td>
+                                    <td>@movie.Title</td>
+                                    <td>@movie.Genre.GenreName</td>
+                                    <td>
+                                        @{
+                                            double averageRating = 0;
+
+                                            if (movie.Rating != null && movie.Rating.Any())
+                                            {
+                                                averageRating = movie.Rating.Average(r => r.Rate);
+                                            }
+                                        }
+
+                                        @if (averageRating > 0)
+                                        {
+                                            <i class="bi bi-star-fill text-warning pe-1" style="font-size:14px"></i>
+                                            @averageRating<span>/5</span>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-star-fill text-warning pe-1" style="font-size:14px"></i>
+                                            <b>0/5</b>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+
+            <div class="w-50 bg-card rounded-3 ms-4">
+                <div class="d-flex justify-content-between border-bottom px-2 pt-3 pb-2">
+                    <h6 class="bi bi-film"><span class="ms-2">Latest  Movies</span></h6>
+                    <div>
+                        <i class="bi bi-arrow-clockwise text-white me-3"></i>
+                        <a asp-area="Admin" asp-controller="Movies" asp-action="Index" class="btn btn-sm text-white">View All</a>
+                    </div>
+                </div>
+                <div class="p-3">
+                    <table class="table dt text-white">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>TITLE</th>
+                                <th>GENRE</th>
+                                <th>DATE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var movie in Model.LatestMovies)
+                            {
+                                <tr>
+                                    <td>@movie.MovieId</td>
+                                    <td>@movie.Title</td>
+                                    <td>@movie.Genre.GenreName</td>
+                                    <td>@movie.Created_at.ToString("dd/MM/yy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="d-flex mt-4">
+
+            <div class="w-50 bg-card rounded-3">
+                <div class="d-flex justify-content-between border-bottom px-2 pt-3 pb-2">
+                    <h6 class="bi bi-people-fill"><span class="ms-2">Latest Users</span></h6>
+                    <div>
+                        <i class="bi bi-arrow-clockwise text-white me-3"></i>
+                        <a asp-area="Admin" asp-controller="Users" asp-action="GetUsers" class="btn btn-sm text-white">View All</a>
+                    </div>
+                </div>
+                <div class="p-3">
+                    <table class="table dt text-white">
+                        <thead>
+                            <tr>
+                                <th>USERNAME</th>
+                                <th>EMAIL</th>
+                                <th>STATUS</th>
+                                <th>DATE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model.LatestUsers)
+                            {
+                                <tr>
+                                    <td>@user.UserName</td>
+                                    <td>
+                                        <span id="emailSpan_@user.UserName">@user.Email</span>
+                                        <script>
+                                            var emailSpan = document.getElementById('emailSpan_@user.UserName');
+                                            if (emailSpan.innerText.length > 10) {
+                                                emailSpan.innerText = emailSpan.innerText.substring(0, 10) + '...';
+                                            }
+                                        </script>
+                                    </td>
+                                    <td>
+                                        @if (user.IsActivated)
+                                        {
+                                            <span class="text-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger">Inactive</span>
+                                        }
+                                    </td>
+                                    <td>@user.CreatedAt.ToString("dd/MM/yy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <div class="w-50 bg-card rounded-3 ms-4">
+                <div class="d-flex justify-content-between border-bottom px-2 pt-3 pb-2">
+                    <h6 class="bi bi-star-half"><span class="ms-2">Latest reviews</span></h6>
+                    <div>
+                        <i class="bi bi-arrow-clockwise text-white me-3"></i>
+                        <a asp-area="Admin" asp-controller="Ratings" asp-action="Index" class="btn btn-sm text-white">View All</a>
+                    </div>
+                </div>
+                <div class="p-3">
+                    <table class="table dt text-white">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>COMMENT</th>
+                                <th>USERNAME</th>
+                                <th>RATING</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var rate in Model.LastesReviews)
+                            {
+                                <tr>
+                                    <td>@rate.Movie.Title</td>
+                                    <td>
+                                        <span id="comentSpan_@rate.RatingId">@rate.Comment</span>
+                                        <script>
+                                            var comentSpan = document.getElementById('comentSpan_@rate.RatingId');
+                                            if (comentSpan.innerText.length > 12) {
+                                                comentSpan.innerText = comentSpan.innerText.substring(0, 12) + '...';
+                                            }
+                                        </script>
+                                    </td>
+                                    <td>
+                                    <span id="usernameSpan_@rate.RatingId">@rate.UserName</span>
+                                    <script>
+                                        var usernameSpan = document.getElementById('usernameSpan_@rate.RatingId');
+                                        if (usernameSpan.innerText.length > 6) {
+                                            usernameSpan.innerText = usernameSpan.innerText.substring(0, 6) + '...';
+                                        }
+                                        </script>
+                                    </td>
+                                    <td>
+                                        @{
+                                            double averageRating = 0;
+
+                                            if (rate.Movie.Rating != null && rate.Movie.Rating.Any())
+                                            {
+                                                averageRating = rate.Movie.Rating.Average(r => r.Rate);
+                                            }
+                                        }
+
+                                        @if (averageRating > 0)
+                                        {
+                                            <i class="bi bi-star-fill text-warning pe-1" style="font-size:14px"></i>
+                                            @averageRating
+
+                                            <span>/5</span>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-star-fill text-warning pe-1" style="font-size:14px"></i>
+                                            <b>0/5</b>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

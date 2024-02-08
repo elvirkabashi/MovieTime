@@ -1,0 +1,76 @@
+﻿@model MovieTime.Models.Movie
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h4 class="text-white">Create Movie</h4>
+<hr />
+<div class="text-white d-flex justify-content-center w-100">
+    <div class="col-md-4 w-50">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="d-flex gap-2">
+                <div class="form-group w-100">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" placeholder="Movie Title"/>
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Year" class="control-label"></label>
+                    <input asp-for="Year" class="form-control" placeholder="Published year" />
+                    <span asp-validation-for="Year" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" placeholder="Movie Description" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="d-flex gap-2">
+                <div class="form-group w-50">
+                    <label asp-for="Genre" class="control-label"></label>
+                    <select asp-for="GenreId" class="form-control" asp-items="@(new SelectList(ViewBag.GenreList, "Value", "Text"))">
+                        <option value="">Genre</option>
+                    </select>
+                    <span asp-validation-for="GenreId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="IMG" class="control-label"></label>
+                    <input asp-for="ImageFile" type="file" class="form-control" />
+                    <span asp-validation-for="ImageFile" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="TrilerURL" class="control-label"></label>
+                <input asp-for="TrilerURL" class="form-control" placeholder="Youtube link triler" />
+                <span asp-validation-for="TrilerURL" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Actors</label>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach (var actor in ViewBag.ActorList)
+                    {
+                        <div class="form-check">
+                            <input type="checkbox" id="actor-@actor.Value" name="SelectedActorIds" value="@actor.Value" class="form-check-input" />
+                            <label for="actor-@actor.Value" class="form-check-label">@actor.Text</label>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="form-group float-end mt-3">
+                <input type="submit" value="Create" class="btn btn-outline-warning" />
+            </div>
+        </form>
+    </div>
+</div>
+<div>
+    <a class="text-warning" asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

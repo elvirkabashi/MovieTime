@@ -1,0 +1,121 @@
+﻿@model IEnumerable<MovieTime.Models.Rating>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1 class="text-white">Reviews</h1>
+<table class="table us text-white">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>MOVIE</th>
+            <th>USERNAME</th>
+            <th>COMMENT</th>
+            <th>
+                <a class="text-white" asp-area="Admin" asp-action="Index" asp-route-sortOrder="@(ViewBag.CurrentSort == "rate_asc" ? "rate_desc" : "rate_asc")">
+                    RATING <i class="bi bi-arrow-down-up text-white ms-1"></i>
+                </a>
+            </th>
+            <th>DATE</th>
+            <th>ACTIONS</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var rating in Model)
+        {
+            <tr>
+                <td class="text-center" style="border-bottom-left-radius:10px;border-top-left-radius:10px;">
+                    <div>
+                        @rating.RatingId
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-itmens-center">
+                        @rating.Movie.Title
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <span>@rating.UserName</span>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        @rating.Comment
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <i class="bi bi-star-fill text-warning pe-1" style="font-size:14px"></i> @rating.Rate
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        @rating.Created.ToString("dd/MM/yy")
+                    </div>
+                </td>
+                <td style="border-bottom-right-radius:10px;border-top-right-radius:10px;">
+                    <div class="delete-icon" data-id="@rating.RatingId" style="cursor: pointer;">
+                        <i style="font-size:20px" class="bi bi-trash3 text-danger trash-icon"></i>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content p-5 bg-dark" >
+            <h3 class="modal-title text-center text-white" id="confirmDeleteModalLabel">Review delete</h3>
+            <p class="text-center text-white" style="opacity:70%">Are you sure to permanently delete this review?</p>
+            <div class="d-flex justify-content-center gap-2">
+                <button type="button" class="btn btn-danger w-25 border-warning" style="background-color:#212529;font-size:14px" id="confirmDeleteBtn">DELETE</button>
+                <button type="button" class="btn btn-secondary w-25" style="background-color:#212529;font-size:14px" data-bs-dismiss="modal">DISMISS</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            $('.delete-icon').click(function () {
+                var ratingId = $(this).data('id');
+                $('#confirmDeleteModal').modal('show');
+
+                $('#confirmDeleteBtn').click(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Admin/Ratings/Delete",
+                        data: { id: ratingId },
+                        success: function (response) {
+                            if (response.success) {
+                                location.reload();
+                            } else {
+                                // Handle error
+                            }
+                        },
+                        error: function () {
+                            // Handle error
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}
+
+
+<div class="d-flex justify-content-center mt-3">
+    <ul class="pagination">
+        @for (int i = ViewBag.Pagination.StartPage; i <= ViewBag.Pagination.EndPage; i++)
+        {
+            <li class="page-item @(i == ViewBag.Pagination.CurrentPage ? "active" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+            </li>
+        }
+    </ul>
+</div>
