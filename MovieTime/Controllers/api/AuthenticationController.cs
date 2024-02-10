@@ -35,7 +35,6 @@ namespace MovieTime.Controllers.api
             if (ModelState.IsValid)
             {
                 var user_exist = await _userManager.FindByEmailAsync(requestDto.Email);
-                var name_exist = await _userManager.FindByNameAsync(requestDto.Name);
 
                 if (user_exist != null)
                 {
@@ -48,24 +47,13 @@ namespace MovieTime.Controllers.api
                         }
                     });
                 }
-                if (name_exist != null)
-                {
-                    return BadRequest(new AuthResult()
-                    {
-                        Result = false,
-                        Errors = new List<string>()
-                        {
-                            "Name already exist"
-                        }
-                    });
-                }
 
                 //create user
                 var new_user = new ApplicationUser()
                 {
                     FullName = requestDto.FullName,
                     Email = requestDto.Email,
-                    UserName = requestDto.Name,
+                    UserName = requestDto.FullName.Replace(" ", "").ToLower(),
                     IsActivated = true
                 };
 

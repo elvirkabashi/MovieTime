@@ -13,7 +13,7 @@ using System.Security.Claims;
 
 namespace MovieTime.Controllers.api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [Route("api/[controller]")]
     [ApiController]
     public class FavoritesController : ControllerBase

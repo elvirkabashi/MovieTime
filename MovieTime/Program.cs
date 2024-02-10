@@ -16,61 +16,61 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+
+builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
+var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
+var key = Encoding.ASCII.GetBytes(jwtConfig.Secret);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(jwt =>
+{
+    jwt.SaveToken = true;
+    jwt.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        RequireExpirationTime = false,
+        ValidateLifetime = true
+    };
+});
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+
+
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
 })
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-
-
-//builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
-
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//})
-//.AddJwtBearer(jwt =>
-//{
-//    var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JwtConfig:Secret").Value);
-
-//    jwt.SaveToken = true;
-//    jwt.TokenValidationParameters = new TokenValidationParameters()
-//    {
-//        ValidateIssuerSigningKey = true,
-//        IssuerSigningKey = new SymmetricSecurityKey(key),
-//        ValidateIssuer = false,
-//        ValidateAudience = false,
-//        RequireExpirationTime = false,
-//        ValidateLifetime = true
-//    };
-//});
-
-builder.Services.AddControllersWithViews();
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    // Cookie settings
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-
     options.LoginPath = "/Identity/Account/Login";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
     options.SlidingExpiration = true;
 });
 
+builder.Services.AddControllersWithViews();
+
 var app = builder.Build();
+
 app.UseCors(policy => policy.AllowAnyHeader()
                         .AllowAnyMethod()
                         .SetIsOriginAllowed(origin => true)
                         .AllowCredentials());
 app.UseStaticFiles();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -78,26 +78,27 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
+
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseAuthentication();
+// Define routes
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{area=Admin}/{controller=Dashboard}/{action=Index}/{id?}");
 
-app.UseEndpoints(endpoints => {
-    endpoints.MapControllerRoute(
-        name: "default",
-        pattern: "{area=Admin}/{controller=Dashboard}/{action=Index}/{id?}");
-    endpoints.MapRazorPages();
-});
+//app.MapControllerRoute(
+//    name: "api",
+//    pattern: "api/[controller]/{action}");
+
 app.MapRazorPages();
 
 app.Run();
+

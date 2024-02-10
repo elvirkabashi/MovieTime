@@ -13,7 +13,7 @@ using MovieTime.Models;
 
 namespace MovieTime.Controllers.api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [Route("api/[controller]")]
     [ApiController]
     public class WatchlistsController : ControllerBase
